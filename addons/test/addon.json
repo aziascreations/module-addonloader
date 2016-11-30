@@ -1,0 +1,16 @@
+{
+  "id": "test",
+  "name": "Test",
+  "description": "Insert text here...",
+  "authors": ["Azias"],
+  "credits": ["none"],
+  "version": {
+    "version": "0.0.0-testing",
+    "friendlyName": "Wot ?"
+  },
+  "hasCode": true,
+  "versionUrl": "",
+  "projectUrl": "",
+  "updateUrl": "",
+  "dependencies": {}
+}
