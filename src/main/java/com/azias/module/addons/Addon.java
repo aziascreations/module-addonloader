@@ -8,10 +8,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Addon {
-	//TODO: change the fields
+	// TODO: change the fields
 	String id();
 	
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.METHOD)
-	public @interface EventHandler{}
+	public @interface EventHandler {
+	}
 }

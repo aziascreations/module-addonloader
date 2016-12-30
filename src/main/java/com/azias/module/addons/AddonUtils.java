@@ -12,7 +12,7 @@ class AddonUtils {
 	 * @return The content of the file.
 	 * @throws IOException
 	 */
-	protected static String fileToString(String path) throws IOException  {
+	protected static String fileToString(String path) throws IOException {
 		return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
 	}
 }
