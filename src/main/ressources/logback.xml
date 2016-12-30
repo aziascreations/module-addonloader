@@ -1,39 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<configuration scan="true">
-
-	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>logs/application.log</file>
-		<encoder>
+<configuration>
+	<property name="LOGS_HOME" value="./logs" />
+	
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>
+				%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
+			</Pattern>
+		</layout>
+	</appender>
+	
+	<appender name="FILE-AUDIT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOGS_HOME}/debug.log</file>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
 			<charset>UTF-8</charset>
-			<pattern>%d{HH:mm:ss} %-5level - %msg%n</pattern>
+			<Pattern>
+				%d{yyyy-MM-dd HH:mm:ss} - %msg%n
+			</Pattern>
 		</encoder>
-		
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">		
-				<fileNamePattern>logs/log_%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-				
-				<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-					<maxFileSize>5MB</maxFileSize>
-				</timeBasedFileNamingAndTriggeringPolicy>
-				
-				<!--<maxHistory>30</maxHistory>-->
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${LOGS_HOME}/archived/debug.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>5MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
 		</rollingPolicy>
 	</appender>
 	
-	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder>
-    	<charset>UTF-8</charset>
-			<pattern>%d{HH:mm:ss} %-5level - %msg%n</pattern>
+	<appender name="FILE-ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOGS_HOME}/error.log</file>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<charset>UTF-8</charset>
+			<Pattern>
+				%d{yyyy-MM-dd HH:mm:ss} - %msg%n
+			</Pattern>
 		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${LOGS_HOME}/archived/error.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>5MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
 	</appender>
 	
-	<root level="DEBUG">
-		<appender-ref ref="FILE" />
-		<appender-ref ref="CONSOLE" />
-	</root>	
+	<logger name="com.azias" level="debug" additivity="false">
+		<appender-ref ref="FILE-AUDIT" />
+		<appender-ref ref="STDOUT" />
+	</logger>
 	
-	<!--<logger name="main" level="INFO">
-		<appender-ref ref="TIME_BASED_FILE" />
-		<appender-ref ref="consoleAppender" />
-	</logger>-->
+	<root level="error">
+		<appender-ref ref="FILE-ERROR" />
+	</root>
 </configuration>

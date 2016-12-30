@@ -1,1 +1,1 @@
-Requires the versioning module
+# Addons Loader Module

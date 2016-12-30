@@ -33,7 +33,7 @@
 		<dependency>
 			<groupId>com.github.aziascreations</groupId>
 			<artifactId>module-versioning</artifactId>
-			<version>f09757aefe</version>
+			<version>-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>
