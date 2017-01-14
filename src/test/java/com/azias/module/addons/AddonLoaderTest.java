@@ -3,9 +3,8 @@ package com.azias.module.addons;
 import java.io.IOException;
 
 public class AddonLoaderTest {
-	
 	public static void main(String[] args) {
-		AddonLoader al = new AddonLoader(new String[]{"test"});
+		AddonLoader al = new AddonLoader(new String[] { "test" });
 		try {
 			al.initialize();
 		} catch (AddonException | IOException e) {
@@ -14,11 +13,11 @@ public class AddonLoaderTest {
 		
 		Callback cb = new CustomCallback();
 		AddonEvent ae = new CustomEvent();
-
+		
 		al.addCallbackTask(cb, ae, true);
 		al.addCallbackTask(cb, ae, true);
 		
-		while(!al.update()) {
+		while (!al.update()) {
 			System.out.println("Loading isn't finished");
 		}
 		
@@ -27,21 +26,20 @@ public class AddonLoaderTest {
 }
 
 class CustomCallback implements Callback {
-
 	@Override
 	public boolean init(AddonEvent event) {
 		System.out.println("Callback's init function called !");
 		return false;
 	}
-
+	
 	@Override
 	public boolean execute(AddonEvent event) {
-		CustomEvent ce = (CustomEvent)event;
+		CustomEvent ce = (CustomEvent) event;
 		System.out.println("Callback's execute function called !");
-		System.out.println("Meaning of life: "+ce.getMeaningOfLife());
+		System.out.println("Meaning of life: " + ce.getMeaningOfLife());
 		return false;
 	}
-
+	
 	@Override
 	public boolean finalize(AddonEvent event) {
 		System.out.println("Callback's finalize function called !");

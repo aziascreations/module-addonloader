@@ -10,10 +10,19 @@ public class AddonInfo {
 	
 	// TOTO: Find how to use it. - Might be usefull to use the "hasCode" var -
 	// It will be usefull for callbacks or AddonsEvents
+	// isLoaded still has no use...
 	protected transient boolean isLoaded = false, hasCode = false;
 	
 	public void resetTransientFields() {
 		this.isLoaded = false;
 		this.hasCode = false;
+	}
+
+	public void setHasCode() {
+		this.setHasCode(true);
+	}
+	
+	public void setHasCode(boolean hasCode) {
+		this.hasCode = hasCode;
 	}
 }

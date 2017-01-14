@@ -3,6 +3,11 @@ package com.azias.module.addons;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,18 +30,21 @@ import com.google.gson.GsonBuilder;
  */
 public class AddonLoader {
 	private final static Logger logger = LoggerFactory.getLogger(AddonLoader.class);
+	/** Use this as the load order */
 	protected String[] addonsIds;
 	protected String addonsFolder;
 	
-	protected HashMap<String, AddonInfo> addonsInfos;
-	protected List<Pair> loadingTasks;
 	protected int currentTaskIndex = 0, currentTaskStep = 0;
+	
+	protected HashMap<String, AddonInfo> addonsInfos;
+	protected List<Class<?>> addonsClasses;
+	protected List<Pair> loadingTasks;
 	
 	protected final GsonBuilder gsonBuilder = new GsonBuilder();
 	protected Gson gson;
 	
-	protected List<Class<?>> addonsClasses;
-	
+	//TODO: Check addons' dependencies.
+	//The load order is defined in/via addonsIds
 	public AddonLoader(String[] addonsIds) {
 		this(addonsIds, "./addons/");
 	}
@@ -61,7 +69,6 @@ public class AddonLoader {
 	public void initialize() throws AddonException, IOException {
 		logger.debug("Initializing the AddonLoader with {} addon(s)", this.addonsIds.length);
 		
-		// Adding Serialiser and Deserialiser for the Version object.
 		this.gsonBuilder.registerTypeAdapter(Version.class, new VersionSerialiser());
 		this.gsonBuilder.registerTypeAdapter(Version.class, new VersionDeserialiser());
 		this.gson = this.gsonBuilder.create();
@@ -77,7 +84,7 @@ public class AddonLoader {
 			throw new AddonException("Addons list is empty!");
 		
 		// Loading addons info files
-		for (int i = 0; i < this.addonsIds.length; i++) {
+		for(int i = 0; i < this.addonsIds.length; i++) {
 			logger.debug("Loading {}...", this.addonsIds[i]);
 			
 			File addonInfoFile = new File(this.addonsFolder + this.addonsIds[i] + "/addon.json");
@@ -85,16 +92,16 @@ public class AddonLoader {
 				throw new IOException("Unable to find: " + addonInfoFile.getPath());
 			
 			try {
-				AddonInfo addonInfo = gson.fromJson(AddonUtils.fileToString(addonInfoFile.getPath()), AddonInfo.class);
+				AddonInfo addonInfo = gson.fromJson(AddonLoader.fileToString(addonInfoFile.getPath()), AddonInfo.class);
 				addonInfo.resetTransientFields(); // Useless ?
 				this.addonsInfos.put(addonInfo.id, addonInfo);
 			} catch (IOException e) {
 				// logger.error(e.getMessage());
 				throw e;
 			} catch (Exception e) {
-				// This part is used to catch the JsonSyntaxException, for some
-				// mystic reason, java can't catch it with a specific "catch",
-				// but just a generic Exception
+				// This part is used to catch the JsonSyntaxException.
+				// For some mystic reason, java can't catch it with a
+				// specific "catch", but just a generic Exception.
 				throw e;
 			} /*
 				 * catch(JsonSyntaxException e) {
@@ -107,15 +114,23 @@ public class AddonLoader {
 		logger.debug("Indexing addons classes...");
 		this.addonsClasses.addAll(new Reflections("").getTypesAnnotatedWith(Addon.class));
 		
+		// TODO: should I use breaks insteal of continues.
 		// Only warns about issues. - TODO: make it more efficient
+		// Looping trough addons classes (i)
 		logger.debug("Checking the addons classes...");
-		for (int i = 0; i < this.addonsClasses.size(); i++) {
+		for(int i = 0; i < this.addonsClasses.size(); i++) {
+			//Checks if classes have an id.
 			if(Strings.isNullOrEmpty(this.addonsClasses.get(i).getAnnotation(Addon.class).id())) {
 				logger.error("An addon class is declared without an id or with an empty one.");
 				continue;
 			}
-			for (int j = 0; j < this.addonsIds.length; j++) {
+			//Checks if an addon(j) has the same id as the current class(i).
+			//Also sets a boolean to check if an addon has code that needs to be executed.
+			for(int j = 0; j < this.addonsIds.length; j++) {
 				if(this.addonsClasses.get(i).getAnnotation(Addon.class).id().equals(this.addonsIds[j])) {
+					logger.debug("Found class for addon: {}", this.addonsClasses.get(i).getAnnotation(Addon.class).id());
+					//TODO: Check for potential NullPointerException when getting a null map entry.
+					addonsInfos.get(this.addonsIds[j]).setHasCode();
 					continue;
 				}
 			}
@@ -125,9 +140,19 @@ public class AddonLoader {
 		logger.info("AddonLoader successfully initialized.");
 	}
 	
-	/*
-	 * Notes: Update the currentTaskIndex at the end of the update function
-	 */
+	// I was tired of going up and down to see the initialize function so
+	// I added a cute cat here to cheer me up and keep me company.
+	//
+	//           .-o=o-.
+	//       ,  /=o=o=o=\ .--.
+	//      _|\|=o=O=o=O=|    \
+	// __.'  o`\=o=o=o=(`\   /
+	// '.  o  3/`|.-""'`\ \ ;'`)   .---.
+	//   \   .'  /   .--'  |_.'   / .-._)
+	//    `)  _.'   /     /`-.__.' /
+	//     `'-.____;     /'-.___.-'
+	//              `"""`
+	
 	/**
 	 * @return true if every task is finished
 	 */
@@ -140,11 +165,47 @@ public class AddonLoader {
 		Pair taskPair = this.loadingTasks.get(this.currentTaskIndex);
 		
 		if(taskPair.getFirst() instanceof String) {
-			logger.debug("Calling functions ...");
+			logger.debug("Calling functions...");
+			//UNTESTED
 			
+			if(this.currentTaskStep >= this.addonsIds.length) {
+				this.currentTaskStep = 0;
+				this.currentTaskIndex++;
+			} else {
+				//TODO: Check for potential NullPointerException when getting a null map entry.
+				if(this.addonsInfos.get(this.addonsIds[this.currentTaskStep]).hasCode) {
+					for(int i = 0; i < this.addonsClasses.size(); i++) {
+						if(this.addonsClasses.get(i).getAnnotation(Addon.class).id().equals(this.addonsIds[this.currentTaskStep])) {
+							//this.addonsClasses.get(i).getMethod(name, parameterTypes)
+							for(Method m : this.addonsClasses.get(i).getMethods()) {
+								if(m.getName().equals((String) taskPair.getFirst())) {
+									try {
+										m.invoke(this.addonsClasses.get(i).newInstance(), taskPair.getSecond());
+									} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | InstantiationException e) {
+										logger.error("An error occured while executing the \"{}\" function for \"{}\"", taskPair.getFirst(), this.addonsIds[this.currentTaskStep]);
+										e.printStackTrace();
+										//System.exit(212);
+									}
+									break;
+								}
+							}
+							break;
+						}
+					}
+				}
+				this.currentTaskStep++;
+			}
 		} else if(taskPair.getFirst() instanceof LoopingCallback) {
 			logger.debug("Executing LoopingCallback...");
-			
+			if(this.currentTaskStep == 0) {
+				if(((LoopingCallback) taskPair.getFirst()).update())
+					this.currentTaskStep++;
+				return false;
+			} else {
+				((LoopingCallback) taskPair.getFirst()).finalize(taskPair.getSecond());
+				this.currentTaskStep = 0;
+				this.currentTaskIndex++;
+			}
 		} else if(taskPair.getFirst() instanceof Callback) {
 			logger.debug("Executing Callback...");
 			((Callback) taskPair.getFirst()).execute(taskPair.getSecond());
@@ -152,22 +213,20 @@ public class AddonLoader {
 			logger.debug("Finalizing Callback execution...");
 			((Callback) taskPair.getFirst()).finalize(taskPair.getSecond());
 			
+			this.currentTaskStep = 0;
 			this.currentTaskIndex++;
-			if(currentTaskIndex >= this.loadingTasks.size()) {
-				return true;
-			}
 		} else {
 			logger.error("Unable to process task, the Pair's first Object is not supported.");
+			this.currentTaskStep = 0;
+			this.currentTaskIndex++;
 		}
 		
-		return false;
+		return (currentTaskIndex >= this.loadingTasks.size()) ? true : false;
 	}
 	
-	/**
-	 * Might be useful later... finalize was already used by the Object class
-	 */
+	@Deprecated
 	public boolean end() {
-		return true;
+		return false;
 	}
 	
 	public boolean addReflectionTask(String functionName, AddonEvent event) {
@@ -211,42 +270,7 @@ public class AddonLoader {
 		return 0.0F;
 	}
 	
-	// http://stackoverflow.com/questions/443708/callback-functions-in-java
-	// Using protected, might restrict access outside of the package...
-	// TODO: Trouver d'autres parametres intéressants/utiles
-	/*
-	 * public interface Callback { boolean init(HashMap<String, AddonInfo>
-	 * addonsInfos, Object... others); boolean execute(HashMap<String,
-	 * AddonInfo> addonsInfos, Object... others); boolean
-	 * finalize(HashMap<String, AddonInfo> addonsInfos, Object... others); }
-	 * public interface LoopingCallback extends Callback { float getProgress();
-	 * boolean update(); //==tick(); }/
-	 **/
-	
-	// How the hell was i supposed to use this ?
-	/**
-	 * @param task
-	 * @param others
-	 */
-	@Deprecated
-	public boolean addReflectionTask(String taskName, String functionName, Object... args) {
-		if(this.loadingTasks == null)
-			return false;
-		
-		return true;
-	}
-	
-	/**
-	 * @param task
-	 * @param others
-	 * @throws AddonException
-	 */
-	@Deprecated
-	public void addCallbackTask(String task, Object... args) throws AddonException {
-		if(this.loadingTasks == null) {
-			logger.error("The AddonLoader isn't initialized.");
-			throw new AddonException("The AddonLoader isn't initialized.");
-		}
-		
+	private static String fileToString(String path) throws IOException {
+		return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
 	}
 }
