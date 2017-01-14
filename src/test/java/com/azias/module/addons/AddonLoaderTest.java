@@ -7,7 +7,7 @@ public class AddonLoaderTest {
 		AddonLoader al = new AddonLoader(new String[] { "test" });
 		try {
 			al.initialize();
-		} catch (AddonException | IOException e) {
+		} catch(AddonException | IOException e) {
 			e.printStackTrace();
 		}
 		

@@ -5,7 +5,7 @@
 
 	<groupId>com.azias</groupId>
 	<artifactId>module-addonloader</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0-alpha</version>
 	<packaging>jar</packaging>
 
 	<name>Addons Loader</name>

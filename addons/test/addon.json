@@ -1,7 +1,7 @@
 {
   "id": "test",
   "name": "Test",
-  "description": "Insert text here...",
+  "description": "This addon is used in the JUnit tests.",
   "authors": ["Azias"],
   "credits": ["none"],
   "version": {

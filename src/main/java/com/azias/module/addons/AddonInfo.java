@@ -2,6 +2,10 @@ package com.azias.module.addons;
 
 import com.azias.module.version.Version;
 
+/**
+ * @author Herwin Bozet
+ * @version 1.0.0-alpha
+ */
 public class AddonInfo {
 	protected String id, name, description;
 	protected String[] authors, credits;

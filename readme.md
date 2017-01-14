@@ -1,6 +1,6 @@
 # Addons Loader Module
 
-[![](https://jitpack.io/v/aziascreations/module-addonloader.svg)](https://jitpack.io/#aziascreations/module-addonloader)
+[![](https://jitpack.io/v/aziascreations/module-addonloader.svg?style=flat-square)](https://jitpack.io/#aziascreations/module-addonloader)
 
 The addon loader module allows you to easily load addons in your program.
 
