@@ -27,3 +27,4 @@ local.properties
 # Custom
 logs/
 build.log
+changelog.md

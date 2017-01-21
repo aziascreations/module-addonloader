@@ -62,7 +62,12 @@ class ACCEvent implements AddonEvent {
 
 @Addon(id = "test")
 class ACCAddon {
-	public static void testMethod(AddonEvent ae) {
-		AddonClassCallingTest.testingValue = ((ACCEvent) ae).getNewTestingValue();
+	public static void testMethod(ACCEvent ae) {
+		AddonClassCallingTest.testingValue = ae.getNewTestingValue();
 	}
+	
+	//The AddonEvent doesn't need to be casted in an addon's class like in a custom AddonEvent.
+	/*public static void testMethod(AddonEvent ae) {
+		AddonClassCallingTest.testingValue = ((ACCEvent) ae).getNewTestingValue();
+	}*/
 }
