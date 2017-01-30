@@ -7,19 +7,16 @@ public class CallbackExample implements Callback {
 	
 	@Override
 	public boolean init(AddonEvent event) {
-		
 		return false;
 	}
 	
 	@Override
 	public boolean execute(AddonEvent event) {
-		
 		return false;
 	}
 	
 	@Override
 	public boolean finalize(AddonEvent event) {
-		
 		return false;
 	}
 	

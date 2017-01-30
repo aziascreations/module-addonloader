@@ -179,7 +179,6 @@ public class AddonLoader {
 		
 		if(taskPair.getFirst() instanceof String) {
 			logger.debug("Calling functions...");
-			//UNTESTED
 			
 			if(this.currentTaskStep >= this.addonsIds.length) {
 				this.currentTaskStep = 0;
@@ -226,16 +225,16 @@ public class AddonLoader {
 					this.currentTaskStep++;
 				return false;
 			} else {
-				((LoopingCallback) taskPair.getFirst()).finalize(taskPair.getSecond());
+				((LoopingCallback) taskPair.getFirst()).finalize((AddonEvent)taskPair.getSecond());
 				this.currentTaskStep = 0;
 				this.currentTaskIndex++;
 			}
 		} else if(taskPair.getFirst() instanceof Callback) {
 			logger.debug("Executing Callback...");
-			((Callback) taskPair.getFirst()).execute(taskPair.getSecond());
+			((Callback) taskPair.getFirst()).execute((AddonEvent)taskPair.getSecond());
 			
 			logger.debug("Finalizing Callback execution...");
-			((Callback) taskPair.getFirst()).finalize(taskPair.getSecond());
+			((Callback) taskPair.getFirst()).finalize((AddonEvent)taskPair.getSecond());
 			
 			this.currentTaskStep = 0;
 			this.currentTaskIndex++;
