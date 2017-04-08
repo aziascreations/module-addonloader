@@ -1,4 +1,4 @@
-package com.azias.module.addons;
+package com.azias.module.common;
 
 /**
  * @author Unknown - Not searched
@@ -13,11 +13,11 @@ public class Pair {
 		this.o2 = o2;
 	}
 	
-	Object getFirst() {
+	public Object getFirst() {
 		return o1;
 	}
 	
-	Object getSecond() {
+	public Object getSecond() {
 		return o2;
 	}
 	
