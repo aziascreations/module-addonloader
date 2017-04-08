@@ -31,7 +31,7 @@ If you want a specific version, you just have to change the *-SNAPSHOT* version 
 If you are using another build automation tool, you can check the [JitPack page](https://jitpack.io/#aziascreations/module-addonloader/) to see how to do it.
 
 ## Usage
-You can check [usage.md](usage.md) for a "complete" guide.<br>
+You can check the [wiki]() for a [complete guide/tour].<br>
 You can also check the [tests](src/test/java/com/azias/module/addons) and [examples](src/example/java/com/azias/module/addons/examples) to see how to "implement" it.
 
 ## Dependencies

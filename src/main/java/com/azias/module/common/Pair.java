@@ -1,4 +1,4 @@
-package com.azias.module.addons;
+package com.azias.module.common;
 
 /**
  * @author Unknown - Not searched
@@ -6,18 +6,18 @@ package com.azias.module.addons;
  */
 public class Pair {
 	public Object o1;
-	public AddonEvent o2;
+	public Object o2;
 	
-	public Pair(Object o1, AddonEvent o2) {
+	public Pair(Object o1, Object o2) {
 		this.o1 = o1;
 		this.o2 = o2;
 	}
 	
-	Object getFirst() {
+	public Object getFirst() {
 		return o1;
 	}
 	
-	AddonEvent getSecond() {
+	public Object getSecond() {
 		return o2;
 	}
 	
@@ -25,11 +25,7 @@ public class Pair {
 		o1 = o;
 	}
 	
-	void setSecond(AddonEvent o) {
+	void setSecond(Object o) {
 		o2 = o;
-	}
-	
-	public String toString() {
-		return "Pair{" + o1 + ", " + o2 + "}";
 	}
 }

@@ -3,18 +3,24 @@ Reading this isn't going to be easy, but I recommend you try to read it and then
 If you manage to do it you can give yourself a pat on the back, I have no cookies left.
 
 ## Content Table
-* [Instantiating the AddonLoader](#instantiating-the-addonloader)
-* [Addon's info file](#addon-s-info-file)
-* [Initializing the AddonLoader]()
-* [Creating a Reflection Task]()
-* [Creating a Callback Task]()
-* [Declaring an Addon's Class]()
-* ["Passing" data with the AddonEvent]()
-* [Executing the Tasks / Loading Stuff]()
+* [AddonLoader](#addonloader)
+   * [Instantiating the AddonLoader](#instantiating-the-addonloader)
+   * [Addon's info file](#addon-s-info-file)
+   * [Initializing the AddonLoader]()
+   * [Creating a Reflection Task]()
+   * [Creating a Callback Task]()
+   * [Declaring an Addon's Class]()
+   * ["Passing" data with the AddonEvent]()
+   * [Executing the Tasks]()<br><br>
+* [MethodCaller](#methodcaller)
+   * [Instantiating the MethodCaller]()
+   * [Initializing the AddonLoader]()
+   * [Executing the Tasks]()
 
-## Instantiating the AddonLoader
-**Note:** The constructors with the boolean aren't implemented yet, use the (String[], String) one.
+<br><hr>
 
+## AddonLoader
+### Instantiating the AddonLoader
 You can instanciate the AddonLoader in 4 different ways:
 
 ```java
@@ -36,9 +42,11 @@ The arguments for the constructor are [as follow] [in this order]:
 * **addonsFolder** - The addons folder's path.
 * **checkDependencies** - Check for addons dependencies [switch].
 
-**Example:** [ConstructorExample.java](src/example/java/com/azias/module/addons/examples/ConstructorExample.java)
+**Example:** [ConstructorExample.java](src/example/java/com/azias/module/addons/examples/ConstructorExample.java)<br>
+**Note:** The constructors with the boolean aren't implemented yet, use the (String[], String) one.
+<br><br>
 
-## Addon's info file
+### Addon's info file
 W.I.P section
 
 This file contains various informations about an addon.
@@ -56,24 +64,44 @@ This file contains various informations about an addon.
 | updateUrl | String | ... |
 | dependencies | HashMap<br>\<String, [Version]()\> | NOT IMPLEMENTED/USED YET |
 **Example:** [addon.json](addons/test/addon.json)
+<br><br>
 
-## Initializing the AddonLoader
+### Initializing the AddonLoader
+Text
+<br><br>
 
-
-## Creating a Reflection Task
+### Creating a Reflection Task
 See [AddonClassCallingTest.java](src/test/java/com/azias/module/addons/AddonClassCallingTest.java)
+<br><br>
 
-## Creating a Callback Task
+### Creating a Callback Task
+Text
+<br><br>
 
-
-## Declaring an Addon's Class
+### Declaring an Addon's Class
 If you want to 
+<br><br>
 
-## "Passing" data with the AddonEvent
+### "Passing" data with the AddonEvent
 See [EventSharedValuesTest.java](src/test/java/com/azias/module/addons/EventSharedValuesTest.java)
+<br><br>
 
-## Executing the Tasks / Loading Stuff
+### Executing the Tasks
+Text
+<br><br>
 
+### ???
+Text ?
+<br><br><hr>
 
-## ???
+## MethodCaller
+### Instantiating the MethodCaller
+Text
+<br><br>
 
+### Initializing the AddonLoader
+Text
+<br><br>
+
+### Executing the Tasks
+Text

@@ -16,6 +16,7 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.azias.module.common.Pair;
 import com.azias.module.version.Version;
 import com.azias.module.version.VersionDeserialiser;
 import com.azias.module.version.VersionSerialiser;
@@ -25,11 +26,10 @@ import com.google.gson.GsonBuilder;
 
 /**
  * @author Herwin Bozet
- * @version 1.0.0-alpha
  */
 public class AddonLoader {
 	private final static Logger logger = LoggerFactory.getLogger(AddonLoader.class);
-	public static final String version = "1.0.0-rc1";
+	public static final String version = "1.0.0";
 	
 	/** Use this as the load order */
 	protected String[] addonsIds;
@@ -169,9 +169,10 @@ public class AddonLoader {
 	 * @return true if every loading tasks has been completed.<br>
 	 *         false if there is still things to do.
 	 */
+	//See LibGDX's AssetManager for a rough idea
 	public boolean update() {
 		if(this.loadingTasks.isEmpty()) {
-			logger.warn("The AddonLoader tasks list is empty.");
+			logger.debug("The AddonLoader tasks list is empty, skipping update().");
 			return true;
 		}
 		
@@ -179,7 +180,6 @@ public class AddonLoader {
 		
 		if(taskPair.getFirst() instanceof String) {
 			logger.debug("Calling functions...");
-			//UNTESTED
 			
 			if(this.currentTaskStep >= this.addonsIds.length) {
 				this.currentTaskStep = 0;
@@ -226,16 +226,16 @@ public class AddonLoader {
 					this.currentTaskStep++;
 				return false;
 			} else {
-				((LoopingCallback) taskPair.getFirst()).finalize(taskPair.getSecond());
+				((LoopingCallback) taskPair.getFirst()).finalize((AddonEvent)taskPair.getSecond());
 				this.currentTaskStep = 0;
 				this.currentTaskIndex++;
 			}
 		} else if(taskPair.getFirst() instanceof Callback) {
 			logger.debug("Executing Callback...");
-			((Callback) taskPair.getFirst()).execute(taskPair.getSecond());
+			((Callback) taskPair.getFirst()).execute((AddonEvent)taskPair.getSecond());
 			
 			logger.debug("Finalizing Callback execution...");
-			((Callback) taskPair.getFirst()).finalize(taskPair.getSecond());
+			((Callback) taskPair.getFirst()).finalize((AddonEvent)taskPair.getSecond());
 			
 			this.currentTaskStep = 0;
 			this.currentTaskIndex++;
@@ -246,6 +246,15 @@ public class AddonLoader {
 		}
 		
 		return (currentTaskIndex >= this.loadingTasks.size()) ? true : false;
+	}
+	
+	/**
+	 * Blocks until all addons are callbacks are executed/loaded.
+	 * @return true if no error occured. - NOT IMPLEMENTED YET
+	 */
+	public boolean finishLoading() {
+		while(!update()) {}
+		return true;
 	}
 	
 	/**
