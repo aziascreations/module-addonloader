@@ -26,7 +26,10 @@ public class EventSharedValuesTest {
 	public void mainTest() {
 		AddonLoader al = new AddonLoader(new String[] {});
 		try {
-			al.initialize(false);
+			// Replaced the old constructor with flags.
+			//al.initialize(false);
+			al.setReqAdnsFlag(false);
+			al.initialize();
 		} catch(Exception e) {
 			e.printStackTrace();
 			fail("An exception occured while initializing the AddonLoader.");
@@ -47,9 +50,7 @@ public class EventSharedValuesTest {
 			fail("Unable to add the second Callback Tasks to the AddonLoader.");
 		}
 		
-		while (!al.update()) {
-			
-		}
+		al.finishLoading();
 		
 		if(((ESVEvent) ae).getDefaultValue() == defaultValue + 6) {
 			assertTrue(true);
