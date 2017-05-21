@@ -1,12 +1,12 @@
 {
   "id": "test",
   "name": "Test",
-  "description": "This addon is used in the JUnit tests.",
+  "description": "This addon is used in the JUnit tests and does not do anything.",
   "authors": ["Azias"],
   "credits": ["none"],
   "version": {
     "version": "0.0.0-testing",
-    "friendlyName": "Wot ?"
+    "friendlyName": "Testing version"
   },
   "hasCode": true,
   "versionUrl": "",

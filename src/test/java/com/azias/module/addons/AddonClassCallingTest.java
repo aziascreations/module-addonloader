@@ -35,10 +35,10 @@ public class AddonClassCallingTest {
 	
 	@Test
 	public void simpleClassCalling() {
-		AddonEvent ae = new ACCEvent();
+		Container ae = new ACCEvent();
 		addonLoader.addReflectionTask("testMethod", ae);
 		
-		while (!addonLoader.update()) {
+		while(!addonLoader.update()) {
 			
 		}
 		
@@ -50,7 +50,7 @@ public class AddonClassCallingTest {
 	}
 }
 
-class ACCEvent implements AddonEvent {
+class ACCEvent implements Container {
 	private int newTestingValue = 41;
 	
 	public int getNewTestingValue() {

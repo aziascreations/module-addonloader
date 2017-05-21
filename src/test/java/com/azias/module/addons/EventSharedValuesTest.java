@@ -26,14 +26,17 @@ public class EventSharedValuesTest {
 	public void mainTest() {
 		AddonLoader al = new AddonLoader(new String[] {});
 		try {
-			al.initialize(false);
+			// Replaced the old constructor with flags.
+			//al.initialize(false);
+			al.setReqAdnsFlag(false);
+			al.initialize();
 		} catch(Exception e) {
 			e.printStackTrace();
 			fail("An exception occured while initializing the AddonLoader.");
 		}
 		
 		Callback cb = new ESVCallback();
-		AddonEvent ae = new ESVEvent();
+		Container ae = new ESVEvent();
 		
 		int defaultValue = 42;
 		((ESVEvent) ae).setDefaultValue(defaultValue);
@@ -47,9 +50,7 @@ public class EventSharedValuesTest {
 			fail("Unable to add the second Callback Tasks to the AddonLoader.");
 		}
 		
-		while (!al.update()) {
-			
-		}
+		al.finishLoading();
 		
 		if(((ESVEvent) ae).getDefaultValue() == defaultValue + 6) {
 			assertTrue(true);
@@ -62,25 +63,25 @@ public class EventSharedValuesTest {
 class ESVCallback implements Callback {
 	
 	@Override
-	public boolean init(AddonEvent event) {
+	public boolean init(AddonLoader al, Container event) {
 		((ESVEvent) event).incrementDefaultValue();
 		return false;
 	}
 	
 	@Override
-	public boolean execute(AddonEvent event) {
+	public boolean execute(AddonLoader al, Container event) {
 		((ESVEvent) event).incrementDefaultValue();
 		return false;
 	}
 	
 	@Override
-	public boolean finalize(AddonEvent event) {
+	public boolean finalize(AddonLoader al, Container event) {
 		((ESVEvent) event).incrementDefaultValue();
 		return false;
 	}
 }
 
-class ESVEvent implements AddonEvent {
+class ESVEvent implements Container {
 	protected int defaultValue = -42;
 	
 	public void setDefaultValue(int par1) {

@@ -28,22 +28,34 @@ public class AddonLoaderErrorsTest {
 	@Test
 	public void emptyAddonsIdsTest() {
 		addonLoader = new AddonLoader(new String[] {});
-		
+
+		logger.info("Testing with required addons...");
 		try {
 			addonLoader.initialize();
 		} catch(AddonException e) {
-			logger.info("Catched the expected AddonException.");
+			logger.info("Catched the AddonException as expected.");
 		} catch(Exception e) {
 			fail("An unknown Exception has been catched.");
 		}
-		
+
+		logger.info("Testing without required addons...");
 		try {
-			addonLoader.initialize(false);
+			addonLoader.setReqAdnsFlag(false);
+			addonLoader.initialize();
 		} catch(AddonException e) {
 			fail("The AddonLoader has cheked if the addonList was empty.");
 		} catch(Exception e) {
 			logger.info("Catched a generic Exception while initializing the AddonLoader with \"false\"");
 		}
+
+		// The old constructor was replaced with flags.
+		/*try {
+			addonLoader.initialize(false);
+		} catch(AddonException e) {
+			fail("The AddonLoader has cheked if the addonList was empty.");
+		} catch(Exception e) {
+			logger.info("Catched a generic Exception while initializing the AddonLoader with \"false\"");
+		}/**/
 		
 		assertTrue(true);
 	}

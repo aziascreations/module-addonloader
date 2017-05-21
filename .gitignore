@@ -28,3 +28,6 @@ local.properties
 logs/
 build.log
 changelog.md
+\.idea/
+
+module-addonloader\.iml
