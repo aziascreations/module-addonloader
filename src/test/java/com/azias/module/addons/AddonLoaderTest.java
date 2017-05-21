@@ -12,7 +12,7 @@ public class AddonLoaderTest {
 		}
 		
 		Callback cb = new CustomCallback();
-		AddonEvent ae = new CustomEvent();
+		Container ae = new CustomEvent();
 		
 		al.addCallbackTask(cb, ae, true);
 		al.addCallbackTask(cb, ae, true);
@@ -27,13 +27,13 @@ public class AddonLoaderTest {
 
 class CustomCallback implements Callback {
 	@Override
-	public boolean init(AddonEvent event) {
+	public boolean init(AddonLoader al, Container event) {
 		System.out.println("Callback's init function called !");
 		return false;
 	}
 	
 	@Override
-	public boolean execute(AddonEvent event) {
+	public boolean execute(AddonLoader al, Container event) {
 		CustomEvent ce = (CustomEvent) event;
 		System.out.println("Callback's execute function called !");
 		System.out.println("Meaning of life: " + ce.getMeaningOfLife());
@@ -41,13 +41,13 @@ class CustomCallback implements Callback {
 	}
 	
 	@Override
-	public boolean finalize(AddonEvent event) {
+	public boolean finalize(AddonLoader al, Container event) {
 		System.out.println("Callback's finalize function called !");
 		return false;
 	}
 }
 
-class CustomEvent implements AddonEvent {
+class CustomEvent implements Container {
 	public int getMeaningOfLife() {
 		return 42;
 	}

@@ -3,5 +3,9 @@ package com.azias.module.addons;
 public interface LoopingCallback extends Callback {
 	float getProgress();
 	
-	boolean update(); // ==tick(); - See libgdx AssetsManager
+	/**
+	 * Called over and over by the AddonLoader until it returns true.
+	 */
+	//boolean update();
+	boolean update(AddonLoader al);
 }

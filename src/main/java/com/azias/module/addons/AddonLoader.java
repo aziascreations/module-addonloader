@@ -1,5 +1,13 @@
 package com.azias.module.addons;
 
+import com.azias.module.common.Pair;
+import com.azias.module.version.Version;
+import com.azias.module.version.VersionDeserialiser;
+import com.azias.module.version.VersionSerialiser;
+import com.google.common.base.Strings;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -16,22 +24,11 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.azias.module.common.Pair;
-import com.azias.module.version.Version;
-import com.azias.module.version.VersionDeserialiser;
-import com.azias.module.version.VersionSerialiser;
-import com.google.common.base.Strings;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 /**
  * @author Herwin Bozet
  */
 public class AddonLoader {
 	private final static Logger logger = LoggerFactory.getLogger(AddonLoader.class);
-	
-	// Might be used later in a DumpInfo() function, not sure.
-	//public static final String version = "1.0.1";
 	
 	/** Use this as the load order */
 	protected String[] addonsIds;
@@ -45,19 +42,19 @@ public class AddonLoader {
 	
 	protected final GsonBuilder gsonBuilder = new GsonBuilder();
 	protected Gson gson;
-
+	
 	protected boolean searchArchives = false;
 	protected boolean requireAddons = true;
-	protected CleaningRule cleaningRule = CleaningRule.NONE;
-
+	protected CleaningMethod cleaningRule = CleaningMethod.NONE;
+	
 	protected boolean hasLoadingErrors = false;
 	
-	//TODO: Allow a sort of re-init. - See SetSmthFlag()... - Being worked on... init[X], update[?], misc[]
-	//TODO: Check addons' dependencies.
+	//TODO: Allow a sort of re-init. - See SetSmthFlag()... - Being worked on... init[X], update[/], misc[?]
 	public AddonLoader(String[] addonsIds) {
 		this(addonsIds, "./addons/");
 	}
 	
+	//TODO: Chack for null array/params.
 	public AddonLoader(String[] addonsIds, String addonsFolder) {
 		logger.debug("Calling AddonLoader constructor with {} and \"{}\" as parameters", Arrays.toString(addonsIds), addonsFolder);
 		// Findbugs was getting pissy so i did what it asked and used clone().
@@ -70,33 +67,16 @@ public class AddonLoader {
 	}
 	
 	/**
-	 * Initialize the AddonLoader and load the addons info files and checks if everything is working correctly and ready to be loaded.
-	 * 
-	 * @param requireAddons
-	 *            A boolean indicating whether an addon is required to
-	 *            initialize the {@link AddonLoader}.
-	 * @throws AddonException
-	 *             Thrown when the addons list is empty, might get removed later
-	 * @throws IOException
-	 *             Thrown if an error occurs when reading a "addon.json" file.
-	 * @throws Exception
-	 *             Thrown if an error occurs when a {@link com.google.gson.JsonSyntaxException}
-	 *             is thrown when parsing a "addon.json" file.
-	 */
-	@Deprecated
-	public void initialize(boolean requireAddons) throws AddonException, IOException {
-		this.initialize();
-	}
-	
-	/**
-	 * Initialize the AddonLoader and load the addons info files and checks if everything is working correctly and ready to be loaded.
+	 * Initialize the AddonLoader and load the addons info files and checks if
+	 * everything is working correctly and ready to be loaded.
 	 * 
 	 * @throws AddonException
 	 *             Thrown when the addons list is empty, might get removed later
 	 * @throws IOException
 	 *             Thrown if an error occurs when reading a "addon.json" file.
 	 * @throws Exception
-	 *             Thrown if an error occurs when a {@link com.google.gson.JsonSyntaxException}
+	 *             Thrown if an error occurs when a
+	 *             {@link com.google.gson.JsonSyntaxException}
 	 *             is thrown when parsing a "addon.json" file.
 	 */
 	public void initialize() throws AddonException, IOException {
@@ -113,15 +93,16 @@ public class AddonLoader {
 		
 		if(addonsIds.length <= 0 && requireAddons)
 			throw new AddonException("Addons are required to continue !");
-
+		
 		// Loading addon.json info files
 		for(String addonId : addonsIds) {
 			logger.debug("Loading {}...", addonId);
-
+			
 			File addonInfoFile = new File(addonsFolder + addonId + "/addon.json");
 			if(!addonInfoFile.exists())
 				throw new IOException("Unable to find: " + addonInfoFile.getPath());
-
+			//TODO?: Remove the id, might cause some silent errors ?
+			
 			try {
 				AddonInfo addonInfo = gson.fromJson(AddonLoader.fileToString(addonInfoFile.getPath()), AddonInfo.class);
 				addonInfo.resetTransientFields();
@@ -137,16 +118,17 @@ public class AddonLoader {
 		// TODO: Use breaks instead of continues.
 		// Looping trough addons classes (i)
 		logger.debug("Checking the addons classes...");
-
+		
 		for(Class<?> addonClass : addonsClasses) {
 			String classId = addonClass.getAnnotation(Addon.class).id();
-
+			
 			// Checks if classes have an id. - Couldn't get it to trigger in tests, it's not really useful anyway.
 			if(Strings.isNullOrEmpty(classId)) {
-				String className = ((addonClass.getPackage()==null)?"NoPackage: ":addonClass.getPackage().getName())+"."+addonClass.getName();
-				throw new AddonException("An addon class is declared without an id or with an empty one. ("+className+")");
+				String className = ((addonClass.getPackage() == null) ? "NoPackage: " : addonClass.getPackage().getName()) + "."
+						+ addonClass.getName();
+				throw new AddonException("An addon class is declared without an id or with an empty one. (" + className + ")");
 			}
-
+			
 			// Checks if an addon(j) has the same id as the current class(i).
 			// And sets the "hasCode" boolean to check if an addon has code that needs to be executed.
 			for(String addonId : addonsIds) {
@@ -165,15 +147,6 @@ public class AddonLoader {
 		logger.info("AddonLoader successfully initialized.");
 	}
 	
-	// I got tired of the old cat
-	//  so I put this one instead
-	//
-	//    /\_/\
-	//  =( °w° )=
-	//    )   (  //
-	//   (__ __)//
-	//
-	
 	/**
 	 * @return true if every loading tasks has been completed.<br>
 	 *         false if there is still things to do.
@@ -191,18 +164,18 @@ public class AddonLoader {
 			logger.debug("Calling functions...");
 			
 			if(this.currentTaskStep >= this.addonsIds.length) {
-				// TODO: Fix this, might block full completion of LoopingCallbacks. - Maybe not, was I that dumb back then ?
+				// TODO?: Fix this, might block full completion of LoopingCallbacks. - Maybe not, was I that dumb back then ?
 				this.currentTaskStep = 0;
 				this.currentTaskIndex++;
 			} else {
 				// Checks for addons without code and skips them
-				//TODO: Check for potential NullPointerException when getting a null map entry.
+				// TODO: Check for potential NullPointerException when getting a null map entry.
 				if(!this.addonsInfos.get(this.addonsIds[this.currentTaskStep]).hasCode) {
 					this.currentTaskStep++;
 					return false;
 				}
 				
-				//TODO: "Unnest" this.
+				// TODO: "Unnest" this. 
 				for(int i = 0; i < this.addonsClasses.size(); i++) {
 					if(this.addonsClasses.get(i).getAnnotation(Addon.class).id().equals(this.addonsIds[this.currentTaskStep])) {
 						//this.addonsClasses.get(i).getMethod(name, parameterTypes)
@@ -225,7 +198,7 @@ public class AddonLoader {
 				
 				this.currentTaskStep++;
 				
-				//TODO: Clean/remove the one in the beginning.
+				// TODO: Clean/remove the one in the beginning.
 				if(this.currentTaskStep >= this.addonsIds.length) {
 					this.currentTaskStep = 0;
 					this.currentTaskIndex++;
@@ -234,20 +207,20 @@ public class AddonLoader {
 		} else if(taskPair.getFirst() instanceof LoopingCallback) {
 			logger.debug("Executing LoopingCallback...");
 			if(this.currentTaskStep == 0) {
-				if(((LoopingCallback) taskPair.getFirst()).update())
+				if(((LoopingCallback) taskPair.getFirst()).update(this))
 					this.currentTaskStep++;
 				return false;
 			} else {
-				((LoopingCallback) taskPair.getFirst()).finalize((AddonEvent)taskPair.getSecond());
+				((LoopingCallback) taskPair.getFirst()).finalize(this, (Container) taskPair.getSecond());
 				this.currentTaskStep = 0;
 				this.currentTaskIndex++;
 			}
 		} else if(taskPair.getFirst() instanceof Callback) {
 			logger.debug("Executing Callback...");
-			((Callback) taskPair.getFirst()).execute((AddonEvent)taskPair.getSecond());
+			((Callback) taskPair.getFirst()).execute(this, (Container) taskPair.getSecond());
 			
 			logger.debug("Finalizing Callback execution...");
-			((Callback) taskPair.getFirst()).finalize((AddonEvent)taskPair.getSecond());
+			((Callback) taskPair.getFirst()).finalize(this, (Container) taskPair.getSecond());
 			
 			this.currentTaskStep = 0;
 			this.currentTaskIndex++;
@@ -262,10 +235,12 @@ public class AddonLoader {
 	
 	/**
 	 * Blocks until all addons and callbacks are executed/loaded.
-	 * @return true if no error occured. - NOT IMPLEMENTED YET.
+	 * 
+	 * @return true if no error occurred. - NOT IMPLEMENTED YET.
 	 */
 	public boolean finishLoading() {
-		while(!update()) {}
+		while(!update()) {
+		}
 		return false;
 	}
 	
@@ -279,14 +254,14 @@ public class AddonLoader {
 	 * @param event
 	 *            An interface implementing {@link AddonEvent}.
 	 * @return true if the task has been added.<br>
-	 *         false if an error occured while trying to add it.
+	 *         false if an error occurred while trying to add it.
 	 */
-	public boolean addReflectionTask(String functionName, AddonEvent event) {
+	public boolean addReflectionTask(String functionName, Container container) {
 		if(this.loadingTasks == null) {
 			logger.error("The AddonLoader isn't initialized.");
 			return false;
 		}
-		this.loadingTasks.add(new Pair(functionName, event));
+		this.loadingTasks.add(new Pair(functionName, container));
 		
 		return true;
 	}
@@ -300,10 +275,10 @@ public class AddonLoader {
 	 * @param event
 	 *            An interface implementing {@link AddonEvent}.
 	 * @return true if the task has been added.<br>
-	 *         false if an error occured while trying to add it.
+	 *         false if an error occurred while trying to add it.
 	 */
-	public boolean addCallbackTask(Callback callback, AddonEvent event) {
-		return this.addCallbackTask(callback, event, true);
+	public boolean addCallbackTask(Callback callback, Container container) {
+		return this.addCallbackTask(callback, container, true);
 	}
 	
 	/**
@@ -318,9 +293,9 @@ public class AddonLoader {
 	 * @param executeInit
 	 *            [A boolean indicating] Read the param name.
 	 * @return true if the task has been added.<br>
-	 *         false if an error occured while trying to add it.
+	 *         false if an error occurred while trying to add it.
 	 */
-	public boolean addCallbackTask(Callback callback, AddonEvent event, boolean executeInit) {
+	public boolean addCallbackTask(Callback callback, Container container, boolean executeInit) {
 		if(this.loadingTasks == null) {
 			logger.error("The AddonLoader isn't initialized.");
 			return false;
@@ -328,13 +303,13 @@ public class AddonLoader {
 		
 		try {
 			if(executeInit)
-				callback.init(event);
+				callback.init(this, container);
 		} catch(Exception e) {
 			logger.error("An error occured while excuting the init function of a Callback.");
 			return false;
 		}
 		
-		this.loadingTasks.add(new Pair(callback, event));
+		this.loadingTasks.add(new Pair(callback, container));
 		
 		return true;
 	}
@@ -360,19 +335,71 @@ public class AddonLoader {
 		return this;
 	}
 	
-	public AddonLoader setCleaningRule(CleaningRule cr) {
+	public AddonLoader setCleaningRule(CleaningMethod cm) {
 		if(this.gson != null)
 			logger.warn("Ignore this please.");
-		this.cleaningRule = cr;
+		this.cleaningRule = cm;
 		return this;
 	}
 	
 	public void dispose() {
 		//Call dispose in addons
 		
-		
 		//Clean if flag is set
 		
+	}
+	
+	/**
+	 * Return the absolute path to the addons folder.
+	 * 
+	 * @return [See above]
+	 */
+	public String getAddonsFolderAbsolutePath() {
+		return addonsFolder;
+	}
+	
+	/**
+	 * Return the given addons folder path in the constructor.
+	 * 
+	 * @return [See above]
+	 */
+	public String getAddonsFolderPath() {
+		return addonsFolder;
+	}
+	
+	/**
+	 * Return an array that contains all the addons ids given in the
+	 * constructor.
+	 * 
+	 * @return the array, no special checks
+	 */
+	public String[] getAddonsIds() {
+		return addonsIds == null ? new String[] {} : (String[]) addonsIds.clone();
+	}
+	
+	/**
+	 * [???]
+	 * 
+	 * @return true if the given addonIds was valid.
+	 */
+	public boolean setAddonsIds(String[] addonIds) {
+		if(addonIds == null)
+			return false;
+		
+		if(gson != null)
+			logger.warn("Changing the addonsIds after initializing might cause some errors.");
+		
+		this.addonsIds = addonIds.clone();
+		return true;
+	}
+	
+	/**
+	 * Returns a Map containing all the loaded addons info files.
+	 * 
+	 * @return null if not initialized or hashmap otherwise
+	 */
+	public HashMap<String, AddonInfo> getAddonsInfo() {
+		return gson != null ? addonsInfos : null;
 	}
 	
 	/**

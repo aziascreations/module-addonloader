@@ -36,7 +36,7 @@ public class EventSharedValuesTest {
 		}
 		
 		Callback cb = new ESVCallback();
-		AddonEvent ae = new ESVEvent();
+		Container ae = new ESVEvent();
 		
 		int defaultValue = 42;
 		((ESVEvent) ae).setDefaultValue(defaultValue);
@@ -63,25 +63,25 @@ public class EventSharedValuesTest {
 class ESVCallback implements Callback {
 	
 	@Override
-	public boolean init(AddonEvent event) {
+	public boolean init(AddonLoader al, Container event) {
 		((ESVEvent) event).incrementDefaultValue();
 		return false;
 	}
 	
 	@Override
-	public boolean execute(AddonEvent event) {
+	public boolean execute(AddonLoader al, Container event) {
 		((ESVEvent) event).incrementDefaultValue();
 		return false;
 	}
 	
 	@Override
-	public boolean finalize(AddonEvent event) {
+	public boolean finalize(AddonLoader al, Container event) {
 		((ESVEvent) event).incrementDefaultValue();
 		return false;
 	}
 }
 
-class ESVEvent implements AddonEvent {
+class ESVEvent implements Container {
 	protected int defaultValue = -42;
 	
 	public void setDefaultValue(int par1) {

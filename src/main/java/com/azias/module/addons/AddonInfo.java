@@ -8,6 +8,11 @@ public class AddonInfo {
 	protected Version version;
 	protected String versionUrl, projectUrl, updateUrl;
 	
+	/**
+	 * TEMP (Absolute or relative -> (given value + addon id))
+	 */
+	protected String folderPath;
+	
 	// isLoaded still has no use...
 	// Might be used to indicate if code has been executed for the addons
 	// TODO: figure that shit out
@@ -30,5 +35,9 @@ public class AddonInfo {
 	
 	public void setHasCode(boolean hasCode) {
 		this.hasCode = hasCode;
+	}
+	
+	public void setPath(String path) {
+		//TODO ...
 	}
 }
